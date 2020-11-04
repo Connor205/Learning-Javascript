@@ -3,51 +3,66 @@
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
-const width = canvas.width = window.innerWidth;
-const height = canvas.height = window.innerHeight;
+const width = canvas.width;
+const height = canvas.height;
 
-let testBall;
+var testBall;
 
-// function to generate random number
+var balls = [];
 
 function random(min, max) {
   const num = Math.floor(Math.random() * (max - min + 1)) + min;
   return num;
 }
 
+class Ball {
+  constructor(x, y, velX, velY, color, size) {
+    this.x = x;
+    this.y = y;
+    this.velX = velX;
+    this.velY = velY;
+    this.color = color;
+    this.size = size;
+  }
 
-function Ball(x, y, velX, velY, color, size) {
-  this.x = x;
-  this.y = y;
-  this.velX = velX;
-  this.velY = velY;
-  this.color = color;
-  this.size = size;
+  draw() {
+    ctx.beginPath();
+    ctx.fillStyle = this.color;
+    ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  collideWith(otherBall) {
+    let distBetween = Math.sqrt(Math.pow(Math.abs(this.x - otherBall.x), 2) + Math.pow(Math.abs(this.y - otherBall.y), 2));
+    return distBetween < (this.size + otherBall.size);
+  }
 }
 
-Ball.prototype.draw = function() {
-  ctx.beginPath();
-  ctx.fillStyle = this.color;
-  ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
-  ctx.fill();
+function createBalls(instances) {
+  i = 0;
+  while (i < instances) {
+    let toAdd = new Ball(random(10, width - 10), random(10, height - 10), random(1,5), random(1,5), 'red', random(5,10));
+    shouldAdd = true;
+    for (b of balls) {
+      if (b.collideWith(toAdd)) {
+        shouldAdd = false; 
+      }
+    }
+    if (shouldAdd){
+      balls.push(toAdd);
+      i++;
+    }
+  }
 }
 
-function wrapper(){
-  console.log(createBall())
-}
 
-function createBall(){
-  alert("I am an alert box!");
-  testBall = new Ball(50, 100, 4, 4, 'blue', 10);
-  testBall.draw();
-  return testBall;
-}
 
-function moveBall() {
-  ctx.clearRect(0,0,canvas.width, canvas.height);
-  testBall.x = 100;
-  testBall.draw();
+function createList(count = 10) {
+  createBalls(count);
+  for (b of balls) {
+    console.log(b);
+    b.draw();
+  }
 }
-
 
 
